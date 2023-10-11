@@ -22,3 +22,24 @@ exports.handler = async (event, context) => {
     await knex.destroy();
   }
 };
+
+exports.handler = async (event, context) => {
+    const knex = Knex(knexConfig);
+    
+    try {
+      await knex.seed();
+      return {
+        statusCode: 200,
+        body: 'Seed successful',
+      };
+    } catch (error) {
+      console.log(error);
+      return {
+        statusCode: 500,
+        body: 'Seed failed',
+        err: error
+      };
+    } finally {
+      await knex.destroy();
+    }
+  };
