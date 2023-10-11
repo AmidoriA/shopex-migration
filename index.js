@@ -12,7 +12,7 @@ exports.handler = async (event, context) => {
       body: 'Migration successful',
     };
   } catch (error) {
-    console.error(error);
+    console.log(error);
     return {
       statusCode: 500,
       body: 'Migration failed',

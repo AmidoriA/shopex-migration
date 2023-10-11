@@ -42,4 +42,4 @@ jobs:
       run: aws lambda update-function-code --function-name knex-core-migration --zip-file fileb://my-lambda-package.zip
 
     - name: Invoke Lambda function
-      run: aws lambda invoke --function-name knex-core-migration out.txt
+      run: aws lambda invoke --function-name knex-core-migration
