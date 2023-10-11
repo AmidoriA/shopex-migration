@@ -1,0 +1,54 @@
+name: Knex Migration
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Install AWS CLI
+      run: |
+        curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+        unzip awscliv2.zip
+        sudo ./aws/install
+
+    - name: Install Node modules
+      run: npm install
+
+    - name: Install jq
+      run: sudo apt-get update && sudo apt-get install -y jq
+
+    - name: Setup AWS CLI
+      run: |
+        aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws configure set default.region ap-southeast-1
+
+
+    - name: Retrieve and Update knexfile
+      run: |
+        STORE_DB_NAME=$(aws secretsmanager get-secret-value --secret-id 'shopex/prod/mysql' | jq -r '.SecretString' | jq -r '.STORE_DB_NAME')
+        STORE_DB_PASSWORD=$(aws secretsmanager get-secret-value --secret-id 'shopex/prod/mysql' | jq -r '.SecretString' | jq -r '.STORE_DB_PASSWORD')
+        STORE_DB_USER=$(aws secretsmanager get-secret-value --secret-id 'shopex/prod/mysql' | jq -r '.SecretString' | jq -r '.STORE_DB_USER')
+        STORE_DB_HOST=$(aws secretsmanager get-secret-value --secret-id 'shopex/prod/mysql' | jq -r '.SecretString' | jq -r '.STORE_DB_HOST')
+
+        sed -i "s/PROD_STORE_DB_NAME/$STORE_DB_NAME/g" knexfile.js
+        sed -i "s/PROD_STORE_DB_PASSWORD/$STORE_DB_PASSWORD/g" knexfile.js
+        sed -i "s/PROD_STORE_DB_USER/$STORE_DB_USER/g" knexfile.js
+        sed -i "s/PROD_STORE_DB_HOST/$STORE_DB_HOST/g" knexfile.js
+
+    - name: Zip the repository content
+      run: zip -r my-lambda-package.zip .
+      
+    - name: Push code to AWS Lambda
+      run: aws lambda update-function-code --function-name knex-core-migration --zip-file fileb://my-lambda-package.zip
+
+    - name: Invoke Lambda function
+      run: aws lambda invoke --function-name knex-core-migration out.txt
