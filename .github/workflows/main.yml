@@ -43,3 +43,6 @@ jobs:
 
     - name: Invoke Lambda function
       run: aws lambda invoke --function-name knex-core-migration out.txt
+
+    - name: Lambda result
+      run: cat out.txt
