@@ -23,7 +23,7 @@ exports.handler = async (event, context) => {
   }
 };
 
-exports.handler = async (event, context) => {
+exports.seed = async (event, context) => {
     const knex = Knex(knexConfig);
     
     try {
