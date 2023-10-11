@@ -42,3 +42,24 @@ exports.seed = function(knex) {
     });
 };
 ```
+
+Chaining
+```javascript
+exports.up = function(knex) {
+  return knex.schema
+    .createTable('users', function(table) {
+      table.increments('id').primary();
+      table.string('username').notNullable();
+      table.string('email').unique().notNullable();
+      table.string('password').notNullable();
+    })
+    .then(() => {
+      return knex.schema.createTable('posts', function(table) {
+        table.increments('id').primary();
+        table.string('title').notNullable();
+        table.string('content').notNullable();
+        table.integer('user_id').unsigned().references('id').inTable('users');
+      });
+    });
+};
+```
