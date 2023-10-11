@@ -27,7 +27,7 @@ exports.seed = async (event, context) => {
     const knex = Knex(knexConfig);
     
     try {
-      await knex.seed();
+      await knex.seed.run();
       return {
         statusCode: 200,
         body: 'Seed successful',
@@ -42,4 +42,4 @@ exports.seed = async (event, context) => {
     } finally {
       await knex.destroy();
     }
-  };
+};
