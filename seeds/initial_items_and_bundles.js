@@ -9,6 +9,7 @@ exports.seed = async function(knex) {
   await knex('bundle_items').truncate();
   await knex('items').truncate();
   await knex('bundles').truncate();
+  await knex('users').truncate();
 
   await knex('items').insert([
     { name: 'First Item', description: 'First item description'},
