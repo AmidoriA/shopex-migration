@@ -10,23 +10,27 @@ npx knex init
 
 To create a new migration, run:
 ```bash
-npx knex migrate:make create_users_table
+npx knex migrate:make create_users_table --env developmentStoreFrontApi
 ```
 
 To run the migrations:
 ```bash
-npx knex migrate:latest
+npx knex migrate:latest --env developmentStoreFrontApi
 ```
 
 To rollback the migrations:
 ```bash
-npx knex migrate:rollback
+npx knex migrate:rollback --env developmentStoreFrontApi
 ```
 
 Seeding Data
 ```bash
-npx knex seed:make initial_users
+npx knex seed:make initial_users --env developmentStoreFrontApi
 ```
+
+Env List
+* developmentStoreFrontApi
+* developmentGoogleAuth
 
 ```javascript
 // Seeds file
@@ -62,4 +66,36 @@ exports.up = function(knex) {
       });
     });
 };
+```
+
+
+```yaml
+name: On Release
+
+on:
+  release:
+    types:
+      - published
+
+jobs:
+  take-action:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Run action based on release version
+        run: |
+          VERSION=${{ github.event.release.tag_name }}
+          if [[ $VERSION == core-* ]]; then
+            echo "Running core action"
+            # Insert actions for core releases here, e.g.:
+            # sh ./scripts/core-release.sh
+          elif [[ $VERSION == auth-* ]]; then
+            echo "Running auth action"
+            # Insert actions for auth releases here, e.g.:
+            # sh ./scripts/auth-release.sh
+          else
+            echo "Unrecognized version pattern, skipping."
+          fi
 ```
