@@ -28,6 +28,11 @@ Seeding Data
 npx knex seed:make initial_users --env developmentStoreFrontApi
 ```
 
+To run the migrations:
+```bash
+npx knex seed:run --env developmentStoreFrontApi
+```
+
 Env List
 * developmentStoreFrontApi
 * developmentGoogleAuth
