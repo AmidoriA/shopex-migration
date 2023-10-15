@@ -21,6 +21,7 @@ exports.handler = async (event, context) => {
     await knex.migrate.latest(); // You can also run `rollback`, `currentVersion`, etc.
     return {
       statusCode: 200,
+      service: service,
       body: 'Migration successful',
     };
   } catch (error) {
@@ -54,12 +55,14 @@ exports.seed = async (event, context) => {
       await knex.seed.run();
       return {
         statusCode: 200,
+        service: service,
         body: 'Seed successful',
       };
     } catch (error) {
       console.log(error);
       return {
         statusCode: 500,
+        service: service,
         body: 'Seed failed',
         err: error
       };
