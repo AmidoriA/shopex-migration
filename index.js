@@ -7,7 +7,7 @@ exports.handler = async (event, context) => {
   let env = '';
   if (service == 'core') {
     env = 'productionStoreFrontApi';
-  } else if ('auth') {
+  } else if (service == 'auth') {
     env = 'productionGoogleAuth';
   } else {
     return {
@@ -40,7 +40,7 @@ exports.seed = async (event, context) => {
   let env = '';
   if (service == 'core') {
     env = 'productionStoreFrontApi';
-  } else if ('auth') {
+  } else if (service == 'auth') {
     env = 'productionGoogleAuth';
   } else {
     return {

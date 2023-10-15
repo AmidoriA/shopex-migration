@@ -57,7 +57,7 @@ jobs:
       run: |
         VERSION=${{ github.event.release.tag_name }}
         PUBLISH_SERVICE="${VERSION%%-*}"
-        aws lambda invoke --function-name knex-core-migration --payload '{"service": "$PUBLISH_SERVICE"}' --cli-binary-format raw-in-base64-out out.txt
+        aws lambda invoke --function-name knex-core-migration --payload "{\"service\": \"$PUBLISH_SERVICE\"}" --cli-binary-format raw-in-base64-out out.txt
 
     - name: Lambda result
       run: cat out.txt
