@@ -1,9 +1,9 @@
 name: Knex Migration
 
 on:
-  push:
-    branches:
-      - main
+  release:
+    types:
+      - published
 
 jobs:
   deploy:
@@ -35,6 +35,16 @@ jobs:
         sed -i "s/PROD_STORE_DB_USER/$STORE_DB_USER/g" knexfile.js
         sed -i "s/PROD_STORE_DB_HOST/$STORE_DB_HOST/g" knexfile.js
 
+        GOOGLE_AUTH_DB_NAME=$(aws secretsmanager get-secret-value --secret-id 'shopex/prod/mysql' | jq -r '.SecretString' | jq -r '.GOOGLE_AUTH_DB_NAME')
+        GOOGLE_AUTH_DB_PASSWORD=$(aws secretsmanager get-secret-value --secret-id 'shopex/prod/mysql' | jq -r '.SecretString' | jq -r '.GOOGLE_AUTH_DB_PASSWORD')
+        GOOGLE_AUTH_DB_USER=$(aws secretsmanager get-secret-value --secret-id 'shopex/prod/mysql' | jq -r '.SecretString' | jq -r '.GOOGLE_AUTH_DB_USER')
+        GOOGLE_AUTH_DB_HOST=$(aws secretsmanager get-secret-value --secret-id 'shopex/prod/mysql' | jq -r '.SecretString' | jq -r '.GOOGLE_AUTH_DB_HOST')
+
+        sed -i "s/PROD_GOOGLE_AUTH_DB_NAME/$GOOGLE_AUTH_DB_NAME/g" knexfile.js
+        sed -i "s/PROD_GOOGLE_AUTH_DB_PASSWORD/$GOOGLE_AUTH_DB_PASSWORD/g" knexfile.js
+        sed -i "s/PROD_GOOGLE_AUTH_DB_USER/$GOOGLE_AUTH_DB_USER/g" knexfile.js
+        sed -i "s/PROD_GOOGLE_AUTH_DB_HOST/$GOOGLE_AUTH_DB_HOST/g" knexfile.js
+
     - name: Zip the repository content
       run: zip -r my-lambda-package.zip .
       
@@ -44,7 +54,10 @@ jobs:
         aws lambda update-function-code --function-name knex-core-seed --zip-file fileb://my-lambda-package.zip
 
     - name: Invoke Lambda function
-      run: aws lambda invoke --function-name knex-core-migration out.txt
+      run: |
+        VERSION=${{ github.event.release.tag_name }}
+        PUBLISH_SERVICE="${VERSION%%-*}"
+        aws lambda invoke --function-name knex-core-migration --payload '{"service": "$PUBLISH_SERVICE"}' out.txt
 
     - name: Lambda result
       run: cat out.txt

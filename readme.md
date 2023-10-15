@@ -87,6 +87,8 @@ jobs:
       - name: Run action based on release version
         run: |
           VERSION=${{ github.event.release.tag_name }}
+          PUBLISH_SERVICE="${VERSION%%-*}"
+
           if [[ $VERSION == core-* ]]; then
             echo "Running core action"
             # Insert actions for core releases here, e.g.:

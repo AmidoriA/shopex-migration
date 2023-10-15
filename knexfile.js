@@ -78,10 +78,10 @@ module.exports = {
       database: 'PROD_GOOGLE_AUTH_DB_NAME'
     },
     migrations: {
-      directory: './services/store-front-api/migrations'
+      directory: './services/google-auth/migrations'
     },
     seeds: {
-      directory: './services/store-front-api/seeds'
+      directory: './services/google-auth/seeds'
     }
   }
 

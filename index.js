@@ -1,9 +1,21 @@
 const Knex = require('knex');
 const { Client } = require('mysql'); // Or your database driver
-const knexConfig = require('./knexfile').production; // Assuming you're running this in production
+const knexConfigs = require('./knexfile'); // Assuming you're running this in production
 
 exports.handler = async (event, context) => {
-  const knex = Knex(knexConfig);
+  const service = event.service;
+  let env = '';
+  if (service == 'core') {
+    env = 'productionStoreFrontApi';
+  } else if ('auth') {
+    env = 'productionGoogleAuth';
+  } else {
+    return {
+      statusCode: 400,
+      body: 'Invalid Env'
+    };
+  }
+  const knex = Knex(knexConfigs[env]);
   
   try {
     await knex.migrate.latest(); // You can also run `rollback`, `currentVersion`, etc.
@@ -24,7 +36,19 @@ exports.handler = async (event, context) => {
 };
 
 exports.seed = async (event, context) => {
-    const knex = Knex(knexConfig);
+  const service = event.service;
+  let env = '';
+  if (service == 'core') {
+    env = 'productionStoreFrontApi';
+  } else if ('auth') {
+    env = 'productionGoogleAuth';
+  } else {
+    return {
+      statusCode: 400,
+      body: 'Invalid Env'
+    };
+  }
+  const knex = Knex(knexConfigs[env]);
     
     try {
       await knex.seed.run();
